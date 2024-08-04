@@ -9,42 +9,72 @@ const words = [
   'ракета',
   'музыка',
 ];
-const word = words[Math.floor(Math.random() * words.length)];
 
-const answerArr = [];
-for (let i = 0; i < word.length; i++) {
-  answerArr[i] = '_';
-}
+const chooseWord = () => {
+  return words[Math.floor(Math.random() * words.length)];
+};
 
+const setupAnswerArray = (word) => {
+  let answerArr = [];
+  for (let i = 0; i < word.length; i++) {
+    answerArr[i] = '_';
+  }
+  return answerArr;
+};
+
+const word = chooseWord();
+const answerArray = setupAnswerArray(word);
 let remainLetters = word.length;
-let attempt = word.length + 7;
+let attempt = remainLetters + 6;
 
-while (remainLetters > 0 && attempt > 0) {
-  alert(answerArr.join(' '));
-  let guess = prompt('Введите букву или нажмите Отмена для выхода из игры').toLowerCase();
+const showPlayerProgress = (answerArray) => {
+  alert(answerArray.join(' '));
+};
+
+const getGuess = () => {
+  return prompt('Введите букву или нажмите Отмена для выхода из игры').toLowerCase();
+};
+
+const updateGameState = (guess, word, answerArray) => {
+  let count = 0;
+  attempt--;
+  for (let i = 0; i < word.length; i++) {
+    if (guess === word[i]) {
+      attempt++;
+      if (answerArray[i] !== guess) {
+        count++;
+        answerArray[i] = guess;
+      }
+    } else {
+      continue;
+    }
+  }
+  return count;
+};
+
+const resultGame = (answerArray) => {
+  alert(answerArray.join(' '));
+  if (remainLetters > 0 && attempt <= 0) {
+    alert('Попытки закончились, загаданным словом было - ' + word);
+  }
+  if (remainLetters === 0) {
+    alert('Победа, слово которое было загадно - ' + word);
+  }
+};
+
+while (remainLetters > 0) {
+  showPlayerProgress(answerArray);
+  let guess = getGuess();
   if (guess === null) {
     break;
   } else if (guess.length !== 1) {
-    alert('Введите только 1 букву');
+    alert('Пожалуйста, введите одиночную букву.');
   } else {
-    for (let i = 0; i < word.length; i++) {
-      console.log(remainLetters);
-      if (word[i] === guess) {
-        if (answerArr[i] === '_') {
-          remainLetters--;
-          attempt--;
-        }
-        answerArr[i] = guess;
-      }
-    }
+    const correctGuesses = updateGameState(guess, word, answerArray);
+    remainLetters -= correctGuesses;
   }
-
-  if (remainLetters > 0 && attempt === 0) {
-    alert('Попытки закончились, загаданным словом было - ' + word);
-  }
-
-  if (remainLetters === 0) {
-    alert(answerArr.join(' '));
-    alert('Победа, слово которое было загадно - ' + word);
+  if (remainLetters > 0 && attempt <= 0) {
+    break;
   }
 }
+resultGame(answerArray);
